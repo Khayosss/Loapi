@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080d19">
+  <title>Loapi — Dating differently</title>
+  <meta name="description" content="Dating without the photos, until you both say yes. Join the early access waitlist in Gaborone.">
+
+  <!-- Link previews (WhatsApp, Facebook, X). Add an og:image once you have a 1200x630 picture. -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Loapi — Dating without the photos">
+  <meta property="og:description" content="Get to know someone before you see them. Photos are revealed only when you both say yes.">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Runs before the page paints so the saved theme shows with no flash -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("loapi-theme");
+        var theme = saved || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Arsenal:wght@400;500;600;700&family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Arsenal:wght@400;500;600;700&family=Nothing+You+Could+Do&display=swap');
+
+:root {
+  color-scheme: dark;
+  --bg: #080d19;
+  --bg-soft: #0d1728;
+  --surface: rgba(16, 28, 46, 0.78);
+  --surface-border: rgba(166, 204, 232, 0.20);
+  --text: #f5f7fb;
+  --muted: #aab8c8;
+  --faint: #718399;
+  --blue: #75c9f2;
+  --blue-strong: #42b5eb;
+  --line: rgba(195, 215, 231, 0.32);
+  --shadow: rgba(0, 0, 0, 0.28);
+  --font-display: "Nothing You Could Do", cursive;
+  --font-body: "Arsenal", sans-serif;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #eef5f9;
+  --bg-soft: #e4eff6;
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-border: rgba(36, 102, 143, 0.20);
+  --text: #102438;
+  --muted: #43596a;
+  --faint: #587084;
+  --blue: #0b7ab3;
+  --blue-strong: #066a9c;
+  --line: rgba(33, 82, 113, 0.25);
+  --shadow: rgba(35, 79, 108, 0.12);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 14% 12%, rgba(46, 139, 194, 0.15), transparent 34rem),
+    radial-gradient(ellipse at 86% 80%, rgba(31, 112, 166, 0.12), transparent 34rem),
+    linear-gradient(135deg, var(--bg), var(--bg-soft) 58%, var(--bg));
+  color: var(--text);
+  font-family: var(--font-body);
+  transition: background 300ms ease, color 300ms ease;
+}
+
+.ambient {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  border: 1px solid rgba(117, 201, 242, 0.12);
+  border-radius: 50%;
+}
+.ambient-one { width: 42rem; height: 42rem; top: -27rem; right: -9rem; }
+.ambient-two { width: 52rem; height: 52rem; bottom: -43rem; left: 35%; }
+
+.site-header {
+  width: min(92%, 1440px);
+  min-height: 88px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+}
+
+.wordmark {
+  position: relative;
+  color: var(--text);
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3vw, 2.65rem);
+  font-weight: 700;
+  letter-spacing: -0.08em;
+  line-height: 1;
+}
+.wordmark > span { color: var(--text); }
+
+.main-nav { display: flex; align-items: center; gap: clamp(1.2rem, 3vw, 2.8rem); }
+.main-nav a {
+  color: var(--muted);
+  font-size: 1rem;
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+.main-nav a:hover { color: var(--blue); }
+
+.theme-toggle {
+  width: 76px;
+  height: 34px;
+  padding: 0 4px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--surface-border);
+  border-radius: 99px;
+  background: var(--surface);
+  cursor: pointer;
+}
+.theme-icon {
+  z-index: 1;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+.theme-icon svg { width: 16px; height: 16px; display: block; }
+.toggle-thumb {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  left: 4px;
+  top: 3px;
+  border-radius: 50%;
+  background: var(--blue);
+  transition: transform 220ms ease;
+}
+:root[data-theme="light"] .toggle-thumb { transform: translateX(40px); }
+/* The icon sitting under the thumb is the current mode, so it gets the contrasting colour */
+:root[data-theme="light"] .sun,
+:root:not([data-theme="light"]) .moon { color: var(--bg); }
+
+.hero {
+  width: min(92%, 1440px);
+  margin: 0 auto;
+  padding: clamp(3.6rem, 7vw, 6.6rem) 0 3.2rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.8fr);
+  align-items: center;
+  gap: clamp(3rem, 7vw, 7.5rem);
+}
+
+.hero-copy { min-width: 0; }
+.eyebrow {
+  margin: 0 0 1.5rem;
+  color: var(--blue);
+  font-size: 0.83rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.eyebrow span { padding: 0 0.25rem; }
+
+h1 {
+  max-width: 900px;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 6.3vw, 6.5rem);
+  font-weight: 700;
+  letter-spacing: -0.065em;
+  line-height: 1.16;
+}
+h1 em {
+  color: var(--blue);
+  font-style: normal;
+  text-shadow: 0 0 35px rgba(66, 181, 235, 0.12);
+}
+
+.steps {
+  max-width: 720px;
+  margin-top: clamp(2.4rem, 4vw, 3.6rem);
+  display: grid;
+  gap: 1.15rem;
+}
+.step {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  align-items: start;
+  gap: 1.2rem;
+}
+.step-number {
+  min-height: 3.2rem;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid var(--line);
+  color: var(--blue);
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 700;
+}
+.step-copy h2 {
+  margin: 0 0 0.2rem;
+  font-family: var(--font-body);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.step-copy p {
+  margin: 0;
+  max-width: 36rem;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.access-note {
+  margin: 2.6rem 0 0;
+  color: var(--blue);
+  font-size: 0.98rem;
+  letter-spacing: 0.02em;
+}
+
+.signup-card {
+  padding: clamp(1.6rem, 3vw, 2.6rem);
+  border: 1px solid var(--surface-border);
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: 0 24px 70px var(--shadow);
+  backdrop-filter: blur(18px);
+}
+.card-topline {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--blue);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+.signup-card > h2 {
+  margin: 1.2rem 0 0.35rem;
+  font-family: var(--font-body);
+  font-size: clamp(1.8rem, 2.6vw, 2.3rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.card-intro { margin: 0 0 2rem; color: var(--muted); line-height: 1.5; }
+
+form { display: grid; gap: 0.65rem; }
+form label {
+  margin-top: 0.45rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.optional { color: var(--faint); font-weight: 400; text-transform: none; letter-spacing: 0; }
+input, select {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 1rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 13px;
+  outline: none;
+  background: var(--bg-soft);
+  color: var(--text);
+  font: 1rem var(--font-body);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+input::placeholder { color: var(--faint); }
+input:focus, select:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(66, 181, 235, 0.13);
+}
+select { cursor: pointer; }
+.submit-button {
+  min-height: 54px;
+  margin-top: 0.9rem;
+  padding: 0 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  border: 0;
+  border-radius: 13px;
+  background: var(--blue);
+  color: #071421;
+  font: 700 1rem var(--font-body);
+  cursor: pointer;
+  transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+.submit-button:hover {
+  transform: translateY(-2px);
+  background: var(--blue-strong);
+  box-shadow: 0 10px 28px rgba(66, 181, 235, 0.2);
+}
+.submit-button span { font-size: 1.2rem; }
+.form-message { min-height: 1.1rem; margin: 0; color: var(--blue); font-size: 0.85rem; }
+
+.privacy-note {
+  margin-top: 1.1rem;
+  padding-top: 1rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.55rem;
+  border-top: 1px solid var(--line);
+  color: var(--faint);
+  text-align: center;
+}
+.privacy-note p { margin: 0; font-size: 0.8rem; line-height: 1.5; }
+.lock-icon { color: var(--blue); font-size: 1rem; }
+
+/* HEADER SIGN-UP BUTTON */
+.main-nav .nav-cta {
+  padding: 0.55rem 1.1rem;
+  border-radius: 99px;
+  background: var(--blue);
+  color: #071421;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.main-nav .nav-cta:hover { background: var(--blue-strong); color: #071421; }
+/* White text on the darker light-mode blue keeps the buttons readable */
+:root[data-theme="light"] .main-nav .nav-cta,
+:root[data-theme="light"] .submit-button { color: #fff; }
+
+/* FORM EXTRAS */
+.field-hint { margin: -0.1rem 0 0; color: var(--faint); font-size: 0.82rem; }
+.submit-button:disabled { opacity: 0.6; cursor: default; transform: none; box-shadow: none; }
+/* Honeypot: hidden from people, but bots fill it in and get ignored */
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+/* FAQ */
+.faq-list {
+  max-width: 820px;
+  margin-top: clamp(2rem, 4vw, 3rem);
+  border-top: 1px solid var(--line);
+}
+.faq-item { border-bottom: 1px solid var(--line); }
+.faq-item summary {
+  padding: 1.25rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  list-style: none;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: "+"; color: var(--blue); font-size: 1.5rem; line-height: 1; }
+.faq-item[open] summary::after { content: "–"; }
+.faq-item p { max-width: 40rem; margin: 0 0 1.3rem; color: var(--muted); line-height: 1.6; }
+
+/* HOW IT WORKS + PRIVACY SECTIONS */
+.section {
+  width: min(92%, 1440px);
+  margin: 0 auto;
+  padding: clamp(4rem, 8vw, 6.5rem) 0;
+  border-top: 1px solid var(--line);
+}
+.section-heading {
+  max-width: 760px;
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 1.2;
+}
+.section-description {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+.how-grid {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+.how-step {
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--line);
+}
+.how-step-label {
+  margin: 0 0 1.6rem;
+  color: var(--blue);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+.how-step h3 {
+  margin: 0 0 0.8rem;
+  font-family: var(--font-body);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.how-step p:last-child {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.privacy-panel {
+  padding: clamp(3rem, 7vw, 5.5rem) clamp(1.5rem, 5vw, 3.5rem);
+  border: 1px solid var(--surface-border);
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: 0 24px 70px var(--shadow);
+  text-align: center;
+}
+.privacy-panel .section-heading { margin: 0 auto 1.2rem; }
+.privacy-panel .section-description { margin: 0 auto; }
+
+.site-footer {
+  width: min(92%, 1440px);
+  margin: 0 auto;
+  padding: 1.2rem 0 1.8rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--faint);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+}
+.site-footer span:last-child { letter-spacing: 0; font-size: 0.85rem; }
+.footer-dot { color: var(--blue); font-size: 0.55rem; }
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; gap: 3rem; }
+  .hero-copy { max-width: 760px; }
+  .signup-card { width: min(100%, 600px); }
+  .how-grid { grid-template-columns: 1fr; }
+  h1 { font-size: clamp(3.2rem, 9vw, 5.8rem); }
+}
+
+@media (max-width: 560px) {
+  .site-header { min-height: 74px; }
+  .main-nav { gap: 0.8rem; }
+  .main-nav a { font-size: 0.88rem; }
+  .main-nav a:not(.nav-cta) { display: none; }
+  .theme-toggle { width: 68px; }
+  :root[data-theme="light"] .toggle-thumb { transform: translateX(32px); }
+  .hero { padding-top: 3rem; }
+  .eyebrow { font-size: 0.68rem; letter-spacing: 0.1em; }
+  h1 { font-size: clamp(2.75rem, 12vw, 4rem); line-height: 1.2; }
+  .desktop-break { display: none; }
+  .step { grid-template-columns: 3.4rem 1fr; gap: 0.9rem; }
+  .step-number { font-size: 1.25rem; }
+  .step-copy h2 { font-size: 1.3rem; }
+  .step-copy p { font-size: 0.94rem; }
+  .signup-card { padding: 1.4rem; border-radius: 17px; }
+  .site-footer { flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+}
+
+  </style>
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <header class="site-header">
+    <a class="wordmark" href="#" aria-label="Loapi home">Loap<span>i</span></a>
+
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="#how-it-works">How it works</a>
+      <a href="#privacy">Privacy</a>
+      <a class="nav-cta" href="#signup">Join waitlist</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch colour theme">
+        <span class="theme-icon moon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 14.5A9 9 0 0 1 9.5 3a9 9 0 1 0 11.5 11.5z"/></svg>
+        </span>
+        <span class="theme-icon sun" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4" fill="currentColor"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </span>
+        <span class="toggle-thumb"></span>
+      </button>
+    </nav>
+  </header>
+
+  <main class="hero">
+    <section class="hero-copy">
+      <p class="eyebrow">A different kind of connection <span>·</span> For Botswana</p>
+
+      <h1>Dating without the<br class="desktop-break"> photos. <em>Until you<br class="desktop-break"> both say yes.</em></h1>
+
+      <div class="steps">
+        <article class="step">
+          <span class="step-number">01</span>
+          <div class="step-copy">
+            <h2>Discover</h2>
+            <p>Get introduced to a small selection of people each day. No swiping, no endless feeds.</p>
+          </div>
+        </article>
+        <article class="step">
+          <span class="step-number">02</span>
+          <div class="step-copy">
+            <h2>Connect</h2>
+            <p>Get to know each other through conversation, shared interests and ideas.</p>
+          </div>
+        </article>
+        <article class="step">
+          <span class="step-number">03</span>
+          <div class="step-copy">
+            <h2>Reveal</h2>
+            <p>When you're both comfortable, reveal your photos. No pressure, no one-sided reveals.</p>
+          </div>
+        </article>
+      </div>
+
+      <p class="access-note">Currently preparing for early access.</p>
+    </section>
+
+    <aside class="signup-card" id="signup" aria-labelledby="signup-title">
+      <div class="card-topline">EARLY ACCESS · GABORONE</div>
+      <h2 id="signup-title">Be among the first.</h2>
+      <p class="card-intro">A more thoughtful way to meet people starts here.</p>
+
+      <form id="waitlistForm">
+        <!-- Honeypot field: leave empty -->
+        <div class="hp" aria-hidden="true">
+          <label for="website">Website</label>
+          <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
+
+        <label for="email">Email address</label>
+        <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" maxlength="254" required>
+        <p class="field-hint">Use an email address you can access. We'll contact you about early access.</p>
+
+        <label for="university">University</label>
+        <select id="university" name="university" required>
+          <option value="" selected disabled>Select your university</option>
+          <option value="University of Botswana">University of Botswana</option>
+          <option value="Botho University">Botho University</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label for="gender">Gender <span class="optional">(optional)</span></label>
+        <select id="gender" name="gender">
+          <option value="" selected>Prefer not to say</option>
+          <option value="Woman">Woman</option>
+          <option value="Man">Man</option>
+          <option value="Non-binary">Non-binary</option>
+          <option value="Self-describe">I'd describe it another way</option>
+        </select>
+
+        <button class="submit-button" type="submit">Join the waitlist <span aria-hidden="true">↗</span></button>
+        <p class="form-message" id="formMessage" role="status"></p>
+      </form>
+
+      <div class="privacy-note">
+        <span class="lock-icon">⌑</span>
+        <p>Your details won't appear on a public profile.<br>We'll never sell your personal information.</p>
+      </div>
+    </aside>
+  </main>
+
+  <section class="section" id="how-it-works">
+    <p class="eyebrow">Less scrolling. More connecting.</p>
+    <h2 class="section-heading">Three steps. One genuine connection.</h2>
+    <p class="section-description">Forget everything you know about dating apps. This works a little differently.</p>
+
+    <div class="how-grid">
+      <article class="how-step">
+        <p class="how-step-label">01 / DISCOVER</p>
+        <h3>Five, not five hundred.</h3>
+        <p>Every day, meet five new people. Explore their personalities, interests and perspectives without seeing their faces.</p>
+      </article>
+      <article class="how-step">
+        <p class="how-step-label">02 / CONNECT</p>
+        <h3>Start with a conversation.</h3>
+        <p>Talk, share ideas and discover what you have in common. Build a connection without appearances getting in the way.</p>
+      </article>
+      <article class="how-step">
+        <p class="how-step-label">03 / REVEAL</p>
+        <h3>Only if you both want to.</h3>
+        <p>When you're ready, request a reveal. Photos become visible only when both people agree.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="privacy">
+    <div class="privacy-panel">
+      <p class="eyebrow">Your identity. Your choice.</p>
+      <h2 class="section-heading">Get to know someone without the whole world knowing.</h2>
+      <p class="section-description">Use a nickname. Keep your photos private. Your identity stays yours until you're comfortable sharing it.</p>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <p class="eyebrow">Good questions</p>
+    <h2 class="section-heading">Before you join.</h2>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>What if I don't want to reveal my photos?</summary>
+        <p>Then you don't have to. Photos only become visible when both people agree, so nobody can reveal you without your say.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Who can see my profile?</summary>
+        <p>Your details won't appear on a public profile. You can use a nickname, and your identity stays yours until you're comfortable sharing it.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Who can join the early access list?</summary>
+        <p>Early access is aimed at students in Gaborone. Choose your university and use an email address you can access. We may verify student status separately before launch.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What happens to my details?</summary>
+        <p>We'll never sell your personal information. For the waitlist we only ask for your email, your university and, if you like, your gender.</p>
+      </details>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <span>LOAPI <span class="footer-dot">●</span> CONNECTION BEFORE APPEARANCE</span>
+    <span>Made for a different kind of connection.</span>
+  </footer>
+
+  <script>
+const themeToggle = document.querySelector("#themeToggle");
+const root = document.documentElement;
+
+function updateToggleLabel() {
+  const isLight = root.dataset.theme === "light";
+  themeToggle.setAttribute(
+    "aria-label",
+    isLight ? "Switch to dark theme" : "Switch to light theme"
+  );
+}
+updateToggleLabel();
+
+themeToggle.addEventListener("click", () => {
+  const newTheme = root.dataset.theme === "light" ? "dark" : "light";
+  root.dataset.theme = newTheme;
+  updateToggleLabel();
+  // Remember the choice for next visit (wrapped in try/catch because storage can be blocked)
+  try { localStorage.setItem("loapi-theme", newTheme); } catch (e) {}
+});
+
+// ---- WAITLIST FORM ----
+// Your deployed Google Apps Script web app endpoint.
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQqFUuRnWmNwJtEj4O1eUdk-Botcpn9gJbY0gXWnJraDgxNWAnjgUMMRGquomZM9Yu3w/exec";
+
+const waitlistForm = document.querySelector("#waitlistForm");
+const formMessage = document.querySelector("#formMessage");
+const submitButton = waitlistForm.querySelector(".submit-button");
+
+const MESSAGES = {
+  ok: "You're on the list. We'll email you when early access opens.",
+  duplicate: "That email is already on the list.",
+  invalid_email: "That email doesn't look right. Please check it.",
+  error: "Something went wrong on our side. Please try again in a moment."
+};
+
+waitlistForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const email = document.querySelector("#email").value.trim().toLowerCase();
+
+  // The browser checks the email format via type="email". We do not restrict domains here;
+  // university affiliation can be checked separately without rejecting valid student addresses.
+
+  submitButton.disabled = true;
+  formMessage.textContent = "Joining…";
+
+  try {
+    // Sending the form as plain URL-encoded fields avoids a CORS preflight, which Apps Script can't answer
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: new URLSearchParams(new FormData(waitlistForm))
+    });
+    const result = await response.json();
+
+    formMessage.textContent = MESSAGES[result.status] || MESSAGES.error;
+    if (result.status === "ok") waitlistForm.reset();
+  } catch (error) {
+    formMessage.textContent = MESSAGES.error;
+  } finally {
+    submitButton.disabled = false;
+  }
+});
+
+  </script>
+</body>
+</html>
