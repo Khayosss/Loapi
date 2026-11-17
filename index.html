@@ -671,6 +671,12 @@ themeToggle.addEventListener("click", () => {
 // Your deployed Google Apps Script web app endpoint.
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQqFUuRnWmNwJtEj4O1eUdk-Botcpn9gJbY0gXWnJraDgxNWAnjgUMMRGquomZM9Yu3w/exec";
 
+const UNIVERSITY_DOMAINS = {
+    "Botho University": ["botho.ac.bw"],
+    "BAC": ["thuto.bac.ac.bw"],
+    "University of Botswana": []
+};
+    
 const waitlistForm = document.querySelector("#waitlistForm");
 const formMessage = document.querySelector("#formMessage");
 const submitButton = waitlistForm.querySelector(".submit-button");
