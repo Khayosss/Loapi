@@ -561,7 +561,7 @@ select { cursor: pointer; }
           <option value="" selected disabled>Select your university</option>
           <option value="University of Botswana">University of Botswana</option>
           <option value="Botho University">Botho University</option>
-          <option value="Botswana Accounancy Collage">Botswana Accounancy Collage</option>
+          <option value="Botswana Accountancy College">Botswana Accountancy College</option>
           <option value="Other">Other</option>
         </select>
 
@@ -672,10 +672,17 @@ themeToggle.addEventListener("click", () => {
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQqFUuRnWmNwJtEj4O1eUdk-Botcpn9gJbY0gXWnJraDgxNWAnjgUMMRGquomZM9Yu3w/exec";
 
 const UNIVERSITY_DOMAINS = {
-    "Botho University": ["botho.ac.bw"],
-    "BAC": ["thuto.bac.ac.bw"],
-    "University of Botswana": ["ub.ac.bw"]
+  "University of Botswana": ["ub.ac.bw"],
+  "Botho University": ["botho.ac.bw"],
+  "Botswana Accountancy College": ["thuto.bac.ac.bw"]
 };
+
+function emailMatchesUniversity(email, university) {
+  const allowed = UNIVERSITY_DOMAINS[university];
+  if (!allowed) return true;
+  const domain = email.slice(email.lastIndexOf("@") + 1);
+  return allowed.some(d => domain === d || domain.endsWith("." + d));
+}
     
 const waitlistForm = document.querySelector("#waitlistForm");
 const formMessage = document.querySelector("#formMessage");
@@ -694,15 +701,11 @@ waitlistForm.addEventListener("submit", async (event) => {
 
   const email = document.querySelector("#email").value.trim().toLowerCase();
 
-// Check whether the email matches the selected university
-const university = document.querySelector('[name="university"]').value;
-const emailDomain = email.split("@")[1];
+const university = document.querySelector("#university").value;
 
-const allowedDomains = UNIVERSITY_DOMAINS[university] || [];
-
-if (!allowedDomains.includes(emailDomain)) {
-    formMessage.textContent = MESSAGES.invalid_domain;
-    return;
+if (!emailMatchesUniversity(email, university)) {
+  formMessage.textContent = MESSAGES.invalid_domain;
+  return;
 }
 
   submitButton.disabled = true;
