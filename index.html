@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#080d19">
   <title>Loapi — Dating differently</title>
-  <meta name="description" content="Dating without the photos, until you both say yes. Join the early access waitlist in Gaborone.">
+  <meta name="description" content="Chatting without the photos, until you both say yes. Join the early access waitlist in Gaborone.">
 
   <!-- Link previews (WhatsApp, Facebook, X). Add an og:image once you have a 1200x630 picture. -->
   <meta property="og:type" content="website">
@@ -685,6 +685,7 @@ const MESSAGES = {
   ok: "You're on the list. We'll email you when early access opens.",
   duplicate: "That email is already on the list.",
   invalid_email: "That email doesn't look right. Please check it.",
+  invalid_domain: "Your email domain doesn't match your selected university.",
   error: "Something went wrong on our side. Please try again in a moment."
 };
 
@@ -693,8 +694,16 @@ waitlistForm.addEventListener("submit", async (event) => {
 
   const email = document.querySelector("#email").value.trim().toLowerCase();
 
-  // The browser checks the email format via type="email". We do not restrict domains here;
-  // university affiliation can be checked separately without rejecting valid student addresses.
+// Check whether the email matches the selected university
+const university = document.querySelector('[name="university"]').value;
+const emailDomain = email.split("@")[1];
+
+const allowedDomains = UNIVERSITY_DOMAINS[university] || [];
+
+if (!allowedDomains.includes(emailDomain)) {
+    formMessage.textContent = MESSAGES.invalid_domain;
+    return;
+}
 
   submitButton.disabled = true;
   formMessage.textContent = "Joining…";
